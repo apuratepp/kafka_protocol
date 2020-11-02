@@ -147,10 +147,10 @@ sasl_plain_token(User, Pass) ->
 sasl_token(Token) ->
   iolist_to_binary(["n,," , 1, "auth=Bearer ", Token, 1, 1]).
 
-mechanism(?oauthbearer) -> <<"OAUTHBEARER">>;
 mechanism(?plain) -> <<"PLAIN">>;
 mechanism(?scram_sha_256) -> <<"SCRAM-SHA-256">>;
 mechanism(?scram_sha_512) -> <<"SCRAM-SHA-512">>;
+mechanism({oauthbearer, Token}) -> <<"OAUTHBEARER">>;
 mechanism({Tag, _User, _Pass}) -> mechanism(Tag).
 
 cs([]) -> "[]";
