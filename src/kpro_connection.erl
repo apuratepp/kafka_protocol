@@ -571,8 +571,6 @@ hint_msg(_, _, _) ->
 -spec get_sasl_opt(config()) -> cfg_val().
 get_sasl_opt(Config) ->
   case maps:get(sasl, Config, ?undef) of
-    {oauthbearer, TokenFunction} -> % when ?IS_OAUTHBEARER(Mechanism) ->
-      {oauthbearer, TokenFunction()};
     {Mechanism, User, Pass0} when ?IS_PLAIN_OR_SCRAM(Mechanism) ->
       Pass = case is_function(Pass0) of
                true  -> Pass0();
@@ -582,6 +580,8 @@ get_sasl_opt(Config) ->
     {Mechanism, File} when ?IS_PLAIN_OR_SCRAM(Mechanism) ->
       {User, Pass} = read_sasl_file(File),
       {Mechanism, User, Pass};
+    {Mechanism, TokenFunction} when ?IS_OAUTHBEARER(Mechanism) ->
+      {Mechanism, TokenFunction()};
     Other ->
       Other
   end.

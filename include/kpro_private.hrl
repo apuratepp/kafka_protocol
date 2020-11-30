@@ -90,7 +90,7 @@
                               Mechanism =:= ?scram_sha_512)).
 -define(IS_PLAIN_OR_SCRAM(Mechanism), (Mechanism =:= ?plain orelse
                                        ?IS_SCRAM(Mechanism))).
--define(IS_OAUTHBEARER(Mechanism), (Mechanism =:= ?oauthbearer))
+-define(IS_OAUTHBEARER(Mechanism), (Mechanism =:= ?oauthbearer)).
 
 -define(KAFKA_0_9,   9).
 -define(KAFKA_0_10, 10).

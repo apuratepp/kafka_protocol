@@ -79,18 +79,6 @@ auth(_Host, Sock, Mod, ClientId, Timeout, Opts, HandshakeVsn) ->
 
 %%%_* Internal functions =======================================================
 
-do_auth(SendRecv, {oauthbearer, Token}, Vsn) ->
-  Req = sasl_token(Token),
-  try
-    <<>> = SendRecv(Req),
-    ok
-  catch
-    error : ?REASON({closed, _Stack}) when Vsn =:= 0 ->
-      %% in version 0 (bare sasl bytes)
-      %% bad credentials result in a remote socket close
-      %% turn it into a more informative error code
-      ?ERROR(bad_credentials)
-  end;
 do_auth(SendRecv, {plain, User, Pass}, Vsn) ->
   Req = sasl_plain_token(User, Pass),
   try
@@ -121,6 +109,18 @@ do_auth(SendRecv, {Scram, User, Pass}, _) when ?IS_SCRAM(Scram) ->
   ServerFinalMsg = SendRecv(ClientFinalMsg),
   %% Validate server signature
   ok = kpro_scram:validate(Scram2, ServerFinalMsg);
+do_auth(SendRecv, {Mechanism, Token}, Vsn) when ?IS_OAUTHBEARER(Mechanism) ->
+  Req = sasl_token(Token),
+  try
+    <<>> = SendRecv(Req),
+    ok
+  catch
+    error : ?REASON({closed, _Stack}) when Vsn =:= 0 ->
+      %% in version 0 (bare sasl bytes)
+      %% bad credentials result in a remote socket close
+      %% turn it into a more informative error code
+      ?ERROR(bad_credentials)
+  end;
 do_auth(_SendRecv, Unknown, _) ->
   ?ERROR({unknown_sasl_opt, Unknown}).
 
