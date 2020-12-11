@@ -580,6 +580,8 @@ get_sasl_opt(Config) ->
     {Mechanism, File} when ?IS_PLAIN_OR_SCRAM(Mechanism) ->
       {User, Pass} = read_sasl_file(File),
       {Mechanism, User, Pass};
+    {Mechanism, TokenFunction} when ?IS_OAUTHBEARER(Mechanism) ->
+      {Mechanism, TokenFunction()};
     Other ->
       Other
   end.
